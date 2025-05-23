@@ -1,5 +1,5 @@
 {
-  "name": "hello-effect",
+  "name": "json-db",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -10,10 +10,14 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "json",
+    "database",
+    "nodejs"
+  ],
+  "author": "Sothearo Kay",
+  "license": "MIT",
+  "description": "A JSON based Database for Node.js",
   "devDependencies": {
     "@types/node": "^22.15.21",
     "@vitest/ui": "^3.1.4",
