@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { resolve } from "path";
 import { access, readFile, writeFile } from "fs/promises";
-import type { IJsonDb } from "../types/json-db";
+import type { IJsonDb } from "./types/json-db";
 
 export class JsonDb<T extends { id: string | number }> implements IJsonDb<T> {
   private readonly filename: string;

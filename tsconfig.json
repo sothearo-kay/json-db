@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "lib",
+    "declarationDir": "dist",
     "module": "ESNext",
     "target": "ES2020",
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "outDir": "lib"
+    "rootDir": "src/lib",
+    "outDir": "dist"
   },
   "include": ["src/lib/**/*.ts"]
 }
