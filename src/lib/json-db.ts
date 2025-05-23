@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { access, readFile, writeFile } from "fs/promises";
 import type { IJsonDb } from "../types/json-db";
 
-export class JsonDb<T extends { id: number }> implements IJsonDb<T> {
+export class JsonDb<T extends { id: string | number }> implements IJsonDb<T> {
   private readonly filename: string;
 
   constructor(filename: string) {
@@ -11,7 +11,11 @@ export class JsonDb<T extends { id: number }> implements IJsonDb<T> {
   }
 
   private async ensureFileExists(): Promise<void> {
-    return access(this.filename).catch(() => writeFile(this.filename, "[]"));
+    try {
+      await access(this.filename);
+    } catch {
+      await writeFile(this.filename, "[]");
+    }
   }
 
   private withFile<T>(fn: () => Promise<T>) {
@@ -33,7 +37,7 @@ export class JsonDb<T extends { id: number }> implements IJsonDb<T> {
 
   private write(data: T[]) {
     return this.withFile(async () => {
-      writeFile(this.filename, JSON.stringify(data, null, 2));
+      await writeFile(this.filename, JSON.stringify(data, null, 2));
     });
   }
 
@@ -98,15 +102,55 @@ export class JsonDb<T extends { id: number }> implements IJsonDb<T> {
     );
   }
 
-  update() {
-    return Effect.fail(new Error("Not implemented"));
+  update(query: Partial<T>, update: Partial<T>) {
+    return this.withData((data) => {
+      let count = 0;
+      const updated = data.map((item) => {
+        const matches = Object.entries(query).every(
+          ([key, value]) => item[key as keyof T] === value,
+        );
+        if (matches) {
+          count++;
+          return { ...item, ...update };
+        }
+        return item;
+      });
+
+      if (count === 0) {
+        return Effect.fail(new Error("No matching records found to update."));
+      }
+      return Effect.flatMap(this.write(updated), () => Effect.succeed(count));
+    });
   }
 
-  updateById() {
-    return Effect.fail(new Error("Not implemented"));
+  updateById(id: T["id"], update: Partial<T>) {
+    return this.withData((data) => {
+      const index = data.findIndex((item) => item.id === id);
+      if (index === -1) {
+        return Effect.fail(new Error(`Item with id ${id} not found.`));
+      }
+
+      const updated = [...data];
+      updated[index] = { ...updated[index], ...update };
+
+      return Effect.flatMap(this.write(updated), () => Effect.succeed(true));
+    });
   }
 
-  deleteById() {
-    return Effect.fail(new Error("Not implemented"));
+  deleteById(id: T["id"]) {
+    return this.withData((data) => {
+      const filtered = data.filter((item) => item.id !== id);
+      if (filtered.length === data.length) {
+        return Effect.fail(
+          new Error(`No record found with id ${id} to delete.`),
+        );
+      }
+
+      return Effect.flatMap(this.write(filtered), () => Effect.succeed(true));
+    });
+  }
+
+  clear() {
+    return Effect.flatMap(this.write([]), () => Effect.succeed([]));
   }
 }
