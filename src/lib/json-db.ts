@@ -1,36 +1,79 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import { Effect } from "effect";
-import { IJsonDb } from "../types/json-db";
+import { resolve } from "path";
+import { access, readFile, writeFile } from "fs/promises";
+import type { IJsonDb } from "../types/json-db";
 
 export class JsonDb<T extends { id: number }> implements IJsonDb<T> {
-  private static instance: JsonDb<any> | null = null;
-  private constructor(private filePath: string) {}
+  private readonly filename: string;
 
-  static getInstance<T extends { id: number }>(
-    filename = "db.json",
-  ): JsonDb<T> {
-    if (!JsonDb.instance) {
-      const filePath = path.resolve(process.cwd(), filename);
-      JsonDb.instance = new JsonDb<T>(filePath);
-    }
-    return JsonDb.instance;
+  constructor(filename: string) {
+    this.filename = resolve(process.cwd(), filename);
+  }
+
+  private async ensureFileExists(): Promise<void> {
+    return access(this.filename).catch(() => writeFile(this.filename, "[]"));
+  }
+
+  private withFile<T>(fn: () => Promise<T>) {
+    return Effect.tryPromise({
+      try: async () => {
+        await this.ensureFileExists();
+        return await fn();
+      },
+      catch: (error) => new Error(String(error)),
+    });
   }
 
   private read() {
-    return Effect.tryPromise({
-      try: async () => {
-        const content = await fs.readFile(this.filePath, "utf-8");
-        return JSON.parse(content) as T[];
-      },
-      catch: (error) => new Error(`Failed to read ${error}`),
+    return this.withFile(async () => {
+      const content = await readFile(this.filename, "utf-8");
+      return JSON.parse(content) as T[];
     });
   }
 
   private write(data: T[]) {
-    return Effect.tryPromise({
-      try: () => fs.writeFile(this.filePath, JSON.stringify(data, null, 2)),
-      catch: (error) => new Error(`Failed to write: ${error}`),
+    return this.withFile(async () => {
+      writeFile(this.filename, JSON.stringify(data, null, 2));
     });
+  }
+
+  getAll() {
+    return this.read();
+  }
+
+  get(n: number) {
+    return Effect.map(this.read(), (data) => data.slice(0, n));
+  }
+
+  add(item: T) {
+    return Effect.gen(
+      function* (this: JsonDb<T>) {
+        const data = yield* this.read();
+        const updated = [...data, item];
+        yield* this.write(updated);
+        return item;
+      }.bind(this),
+    );
+  }
+
+  // Stub others for now
+  getBy() {
+    return Effect.fail(new Error("Not implemented"));
+  }
+
+  addMany() {
+    return Effect.fail(new Error("Not implemented"));
+  }
+
+  update() {
+    return Effect.fail(new Error("Not implemented"));
+  }
+
+  updateById() {
+    return Effect.fail(new Error("Not implemented"));
+  }
+
+  deleteById() {
+    return Effect.fail(new Error("Not implemented"));
   }
 }

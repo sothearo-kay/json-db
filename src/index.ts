@@ -1,28 +1,17 @@
 import { Effect } from "effect";
+import { JsonDb } from "./lib/json-db";
 
-const addServiceCharge = (amount: number) => amount + 1;
+type Book = {
+  id: number;
+  title: string;
+};
 
-const applyDiscount = (
-  total: number,
-  discountRate: number,
-): Effect.Effect<number, Error> =>
-  discountRate === 0
-    ? Effect.fail(new Error("Discount rate cannot be zero"))
-    : Effect.succeed(total - (total * discountRate) / 100);
-
-const fetchTransactionAmount = Effect.promise(() => Promise.resolve(100));
-const fetchDiscountRate = Effect.promise(() => Promise.resolve(5));
+const db = new JsonDb<Book>("books.json");
 
 const program = Effect.gen(function* () {
-  const transactionAmount = yield* fetchTransactionAmount;
-  const discountRate = yield* fetchDiscountRate;
-  const discountedAmount = yield* applyDiscount(
-    transactionAmount,
-    discountRate,
-  );
-
-  const finalAmount = addServiceCharge(discountedAmount);
-  return `Final amount to charge: ${finalAmount}`;
+  yield* db.add({ id: 1, title: "Svelte for Dummies" });
+  const books = yield* db.getAll();
+  console.log("Books:", books);
 });
 
-Effect.runPromise(program).then(console.log);
+Effect.runPromise(program).catch(console.error);
