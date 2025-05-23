@@ -13,7 +13,7 @@
     "test:ui": "vitest --ui"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "keywords": [
     "json",
