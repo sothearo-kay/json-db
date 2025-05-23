@@ -1,8 +1,8 @@
 {
   "name": "noob-json-db",
   "version": "1.0.0",
-  "main": "lib/json-db.js",
-  "types": "lib/json-db.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",

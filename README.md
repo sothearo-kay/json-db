@@ -1,13 +1,18 @@
-# json-db
+# noob-json-db
 
 A lightweight, type-safe JSON database for Node.js, built with [effect](https://effect.website/) for robust functional error handling.
 
-## Features
+---
 
-- Type-Safe: Ensures data integrity through TypeScript generics.
-- Functional Error Handling: Utilizes Effect for predictable and composable error management.
-- Minimalistic: Simple JSON file-based storage without external dependencies.
-- Test-Friendly: Easily testable with frameworks like Vitest.
+## ✨ Features
+
+- Simple JSON file persistence.
+- Basic CRUD operations.
+- Uses [effect](https://effect.website/) for powerful async and error handling.
+- Async API with `createJsonDb` wrapper for easier usage with `async/await`.
+- Written in TypeScript with full types.
+
+---
 
 ## 📦 Installation
 
@@ -15,121 +20,73 @@ A lightweight, type-safe JSON database for Node.js, built with [effect](https://
 npm install noob-json-db
 ```
 
+---
+
 ## 🛠️ Usage
 
 ```ts
-import { JsonDb } from "noob-json-db";
+import { createJsonDb } from "noob-json-db";
 
 type Book = {
   id: number;
   title: string;
 };
 
-const db = new JsonDb<Book>("books.json");
-```
+async function main() {
+  const db = createJsonDb<Book>("books.json");
 
-## API Reference
-
-#### `add(item: T): Effect.Effect<T, Error>`
-
-Adds a single item to the database.
-
-- Behavior: Fails if an item with the same id already exists.
-
-```ts
-yield* db.add({ id: 1, title: "New Book" });
-```
-
-#### `addMany(items: T[]): Effect.Effect<T[], Error>`
-
-Adds multiple items to the database.
-
-- Behavior: Fails if any item has a duplicate id.
-
-```ts
-yield*
-  db.addMany([
-    { id: 2, title: "Book One" },
-    { id: 3, title: "Book Two" },
+  await db.addMany([
+    { id: 1, title: "Svelte for Dummies" },
+    { id: 2, title: "Vue for Dummies" },
+    { id: 3, title: "React for Dummies" },
   ]);
+
+  const books = await db.getAll();
+  console.log("Books:", books);
+}
+
+main().catch(console.error);
 ```
 
-#### `get(n: number): Effect.Effect<T[], Error>`
+---
 
-Retrieves the first n items from the database.
+## 📖 API
+
+The core database class is `JsonDb<T>`, which returns `Effect`-based results. For ease of use, we recommend using the async wrapper:
 
 ```ts
-const books = yield* db.get(5);
+createJsonDb<T>(filename: string): Asyncified<JsonDb<T>>
 ```
 
-#### `getAll(): Effect.Effect<T[], Error>`
+It creates a JSON database instance with asynchronous methods returning promises instead of effects.
 
-Retrieves all items from the database.
+### Methods available on the async wrapper:
 
-```ts
-const allBooks = yield* db.getAll();
+| Method       | Signature                                                    | Description                                         |
+| ------------ | ------------------------------------------------------------ | --------------------------------------------------- |
+| `add`        | `(item: T) => Promise<void>`                                 | Add a single item (fails if duplicate id).          |
+| `addMany`    | `(items: T[]) => Promise<void>`                              | Add multiple items (fails if duplicate ids).        |
+| `get`        | `(n: number) => Promise<T[]>`                                | Get first `n` items.                                |
+| `getAll`     | `() => Promise<T[]>`                                         | Get all items.                                      |
+| `getBy`      | `(query: Partial<T>) => Promise<T[]>`                        | Get items matching query.                           |
+| `update`     | `(query: Partial<T>, update: Partial<T>) => Promise<number>` | Update items matching query; returns count updated. |
+| `updateById` | `(id: T["id"], update: Partial<T>) => Promise<boolean>`      | Update item by id; returns success status.          |
+| `deleteById` | `(id: T["id"]) => Promise<boolean>`                          | Delete item by id; returns success status.          |
+| `clear`      | `() => Promise<void>`                                        | Clear all items.                                    |
+
+---
+
+## 🛠️ Development
+
+```shell
+npm run dev       # Run with watch mode using tsx
+npm run build     # Compile TypeScript to lib/
+npm run test      # Run tests with vitest
+npm run test:ui   # Run vitest UI
 ```
 
-#### `getBy(query: Partial<T>): Effect.Effect<T[], Error>`
+---
 
-Retrieves items matching the specified query.
-
-```ts
-const books = yield* db.getBy({ title: "Book One" });
-```
-
-#### `update(query: Partial<T>, update: Partial<T>): Effect.Effect<number, Error>`
-
-Updates items matching the query with the provided update.
-
-- **Returns:** Number of items updated.
-
-```ts
-const updatedCount = yield* db.update({ title: "Old Title" }, { title: "New Title" });
-```
-
-#### `updateById(id: T["id"], update: Partial<T>): Effect.Effect<boolean, Error>`
-
-Updates a single item by its id.
-
-- **Returns:** true if the item was updated.
-
-```ts
-const success = yield* db.updateById(1, { title: "Updated Title" });
-```
-
-#### `deleteById(id: T["id"]): Effect.Effect<boolean, Error>`
-
-Deletes an item by its id.
-
-- **Returns:** true if the item was deleted.
-
-```ts
-const deleted = yield* db.deleteById(1);
-```
-
-#### `clear(): Effect.Effect<T[], Error>`
-
-Clears all items from the database.
-
-```ts
-yield* db.clear();
-```
-
-## Project Structure
-
-```
-├── src
-│   ├── lib
-│   │   └── json-db.ts
-│   └── index.ts
-├── test
-│   └── json-db.test.ts
-├── books.json
-├── package.json
-└── tsconfig.json
-```
-
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
