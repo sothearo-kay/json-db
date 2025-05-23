@@ -94,11 +94,19 @@ Updates a single item by its id.
 
 - **Returns:** true if the item was updated.
 
+```ts
+const success = yield* db.updateById(1, { title: "Updated Title" });
+```
+
 #### `deleteById(id: T["id"]): Effect.Effect<boolean, Error>`
 
 Deletes an item by its id.
 
 - **Returns:** true if the item was deleted.
+
+```ts
+const deleted = yield* db.deleteById(1);
+```
 
 #### `clear(): Effect.Effect<T[], Error>`
 
