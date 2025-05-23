@@ -9,7 +9,12 @@ type Book = {
 const db = new JsonDb<Book>("books.json");
 
 const program = Effect.gen(function* () {
-  yield* db.add({ id: 1, title: "Svelte for Dummies" });
+  yield* db.addMany([
+    { id: 1, title: "Svelte for Dummies" },
+    { id: 2, title: "Vue for Dummies" },
+    { id: 3, title: "React for Dummies" },
+  ]);
+
   const books = yield* db.getAll();
   console.log("Books:", books);
 });
