@@ -76,6 +76,24 @@ It creates a JSON database instance with asynchronous methods returning promises
 
 ---
 
+## 🔄 How `createJsonDb` Works
+
+The `createJsonDb` function wraps the `JsonDb` class using a JavaScript `Proxy`. This proxy intercepts method calls, detects if they return an `Effect`, and automatically runs them as promises. Makes it possible to use `async/await` syntax seamlessly.
+
+```mermaid
+flowchart TD
+    A["Call: await db.add(item)"] --> B["Proxy intercepts 'add'"]
+    B --> C["Returns wrapped function"]
+    C --> D["Calls target.add(item)"]
+    D --> E["JsonDb.add returns an Effect"]
+    E --> F{"Is result an Effect?"}
+    F -- Yes --> G["Run with Effect.runPromise"]
+    G --> H["Return Promise to caller"]
+    F -- No --> I["Return result directly"]
+```
+
+---
+
 ## 🛠️ Development
 
 ```shell
