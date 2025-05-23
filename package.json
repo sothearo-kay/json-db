@@ -1,15 +1,20 @@
 {
   "name": "json-db",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/json-db.js",
+  "types": "lib/json-db.d.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui"
   },
+  "files": [
+    "lib"
+  ],
   "keywords": [
     "json",
     "database",
