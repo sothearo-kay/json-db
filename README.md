@@ -9,16 +9,16 @@ A lightweight, type-safe JSON database for Node.js, built with [effect](https://
 - Minimalistic: Simple JSON file-based storage without external dependencies.
 - Test-Friendly: Easily testable with frameworks like Vitest.
 
-## Installation
+## 📦 Installation
 
 ```shell
-npm install
+npm install noob-json-db
 ```
 
-## Usage
+## 🛠️ Usage
 
 ```ts
-import { JsonDb } from "./lib/json-db";
+import { JsonDb } from "noob-json-db";
 
 type Book = {
   id: number;
