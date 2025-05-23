@@ -16,4 +16,21 @@ export class JsonDb<T extends { id: number }> implements IJsonDb<T> {
     }
     return JsonDb.instance;
   }
+
+  private read() {
+    return Effect.tryPromise({
+      try: async () => {
+        const content = await fs.readFile(this.filePath, "utf-8");
+        return JSON.parse(content) as T[];
+      },
+      catch: (error) => new Error(`Failed to read ${error}`),
+    });
+  }
+
+  private write(data: T[]) {
+    return Effect.tryPromise({
+      try: () => fs.writeFile(this.filePath, JSON.stringify(data, null, 2)),
+      catch: (error) => new Error(`Failed to write: ${error}`),
+    });
+  }
 }
