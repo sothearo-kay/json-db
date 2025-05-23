@@ -30,7 +30,7 @@ const db = new JsonDb<Book>("books.json");
 
 ## API Reference
 
-### `add(item: T): Effect.Effect<T, Error>`
+#### `add(item: T): Effect.Effect<T, Error>`
 
 Adds a single item to the database.
 
@@ -40,7 +40,7 @@ Adds a single item to the database.
 yield* db.add({ id: 1, title: "New Book" });
 ```
 
-### `addMany(items: T[]): Effect.Effect<T[], Error>`
+#### `addMany(items: T[]): Effect.Effect<T[], Error>`
 
 Adds multiple items to the database.
 
@@ -54,7 +54,7 @@ yield*
   ]);
 ```
 
-### `get(n: number): Effect.Effect<T[], Error>`
+#### `get(n: number): Effect.Effect<T[], Error>`
 
 Retrieves the first n items from the database.
 
@@ -62,7 +62,7 @@ Retrieves the first n items from the database.
 const books = yield* db.get(5);
 ```
 
-### `getAll(): Effect.Effect<T[], Error>`
+#### `getAll(): Effect.Effect<T[], Error>`
 
 Retrieves all items from the database.
 
@@ -70,7 +70,7 @@ Retrieves all items from the database.
 const allBooks = yield* db.getAll();
 ```
 
-### `getBy(query: Partial<T>): Effect.Effect<T[], Error>`
+#### `getBy(query: Partial<T>): Effect.Effect<T[], Error>`
 
 Retrieves items matching the specified query.
 
@@ -78,7 +78,7 @@ Retrieves items matching the specified query.
 const books = yield* db.getBy({ title: "Book One" });
 ```
 
-### `update(query: Partial<T>, update: Partial<T>): Effect.Effect<number, Error>`
+#### `update(query: Partial<T>, update: Partial<T>): Effect.Effect<number, Error>`
 
 Updates items matching the query with the provided update.
 
@@ -88,19 +88,19 @@ Updates items matching the query with the provided update.
 const updatedCount = yield* db.update({ title: "Old Title" }, { title: "New Title" });
 ```
 
-### `updateById(id: T["id"], update: Partial<T>): Effect.Effect<boolean, Error>`
+#### `updateById(id: T["id"], update: Partial<T>): Effect.Effect<boolean, Error>`
 
 Updates a single item by its id.
 
 - **Returns:** true if the item was updated.
 
-### `deleteById(id: T["id"]): Effect.Effect<boolean, Error>`
+#### `deleteById(id: T["id"]): Effect.Effect<boolean, Error>`
 
 Deletes an item by its id.
 
 - **Returns:** true if the item was deleted.
 
-### `clear(): Effect.Effect<T[], Error>`
+#### `clear(): Effect.Effect<T[], Error>`
 
 Clears all items from the database.
 
