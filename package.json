@@ -1,5 +1,5 @@
 {
-  "name": "json-db",
+  "name": "noob-json-db",
   "version": "1.0.0",
   "main": "lib/json-db.js",
   "types": "lib/json-db.d.ts",
